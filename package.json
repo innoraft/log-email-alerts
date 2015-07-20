@@ -1,0 +1,8 @@
+{
+  "name": "aws-backup-tool",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "always-tail": "^0.1.1"
+  }
+}
