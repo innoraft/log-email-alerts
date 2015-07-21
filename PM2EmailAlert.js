@@ -1,12 +1,15 @@
 var Tail = require('always-tail');
 var fs = require('fs');
-if (!fs.existsSync(filename)) fs.writeFileSync(filename, "");
+//add the file names here ! 
+var fileArray=['im.log','im.log.1','im.log.2','im.log.3','im.log.4'],
+	subject='An alert for you';
+	var queue=new Array();
+	var waittime = new Date();
+for (var i = 0; i < fileArray.length; i++) {
+	watchit(fileArray[i],function(){
 
-var tail = new Tail(filename, '\n');
-
-var filename='/path/to/file.log';
-var subject='An alert for you';
-
+	});
+};
 function sendmail(subject,text,callback){
 
 	var nodemailer = require('nodemailer');
@@ -32,10 +35,28 @@ function sendmail(subject,text,callback){
 	});
 }
 
-tail.on('line', function(data) {
-  sendmail(subject,data,function(data){console.log(data)});
-});
-tail.on('error', function(data) {
-  console.log("error:", data);
-});
-tail.watch();
+function watchit(filename,callback)
+{
+	if (!fs.existsSync(filename)) fs.writeFileSync(filename, "");
+	var tail = new Tail(filename, '\n');
+	tail.on('line', function(data) {
+//		console.log(data);
+		queue.push(data);
+		var currentTime = new Date();
+		if(queue.length > 10 && waittime <  currentTime)
+		{
+			sendmail(subject,queue.toString(),function(data){
+				waittime=new Date();
+				waittime=waittime.setMinutes(waittime.getMinutes()+120);
+				queue = [];
+			//	console.log("I will be back " +currentTime+" " + waittime);
+			});
+			
+		}
+	});
+	tail.on('error', function(data) {
+  	console.log("error:", data);
+	});
+	tail.watch();
+	callback();
+}
