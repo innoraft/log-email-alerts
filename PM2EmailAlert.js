@@ -5,6 +5,8 @@ var fileArray=['im.log','im.log.1','im.log.2','im.log.3','im.log.4'],
 	subject='An alert for you';
 	var queue=new Array();
 	var waittime = new Date();
+	var waitBitMore= new Date();
+	waitBitMore.setMinutes(waittime.getMinutes()+1);
 for (var i = 0; i < fileArray.length; i++) {
 	watchit(fileArray[i],function(){
 
@@ -37,25 +39,27 @@ function sendmail(subject,text,callback){
 
 function watchit(filename,callback)
 {
+	
 	if (!fs.existsSync(filename)) fs.writeFileSync(filename, "");
 	var tail = new Tail(filename, '\n');
 	tail.on('line', function(data) {
-//		console.log(data);
+//		console.log(queue.length);
 		queue.push(data);
 		var currentTime = new Date();
-		if(queue.length > 10 && waittime <  currentTime)
+		if((queue.length > 10 || waitBitMore < currentTime) && (waittime <  currentTime))
 		{
 			sendmail(subject,queue.toString(),function(data){
 				waittime=new Date();
-				waittime=waittime.setMinutes(waittime.getMinutes()+120);
+				waittime.setMinutes(currentTime.getMinutes()+120);
+				waitBitMore.setMinutes(waittime.getMinutes()+1);
 				queue = [];
-			//	console.log("I will be back " +currentTime+" " + waittime);
+//				console.log("I will be back " +data +currentTime+" " + waittime);
 			});
 			
 		}
 	});
 	tail.on('error', function(data) {
-  	console.log("error:", data);
+  		console.log("error:", data);
 	});
 	tail.watch();
 	callback();
