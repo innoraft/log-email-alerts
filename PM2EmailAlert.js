@@ -1,17 +1,75 @@
 var Tail = require('always-tail');
 var fs = require('fs');
-//add the file names here ! 
-var fileArray=['im.log','im.log.1','im.log.2','im.log.3','im.log.4'],
-	subject='An alert for you';
-	var queue=new Array();
-	var waittime = new Date();
-	var waitBitMore= new Date();
-	waitBitMore.setMinutes(waittime.getMinutes()+1);
-for (var i = 0; i < fileArray.length; i++) {
-	watchit(fileArray[i],function(){
 
+var events = require('events');
+var eventEmitter = new events.EventEmitter();
+
+var fileArray=['im.log','im.1.log'];
+
+var queue = {};
+var nomoremails = false;
+
+eventEmitter.on('aline',  function(filename){
+    timer(10000, filename);
+    eventEmitter.on('time'+filename,  function(){
+        eventEmitter.emit('sendmail'+filename);
+//        eventEmitter.emit('nomoremails'+filename);
+        nomoremails = true;
+    });
+    
+    eventEmitter.on('enoughlines'+filename,  function(){
+        eventEmitter.emit('sendmail'+filename);
+//        eventEmitter.emit('nomoremails'+filename);
+        nomoremails = true;
+    });
+    
+    eventEmitter.on('sendmail'+filename,  function(){
+        if(!nomoremails)
+        {
+        console.log("sendmail");
+//        sendmail(subject, queue.toString(), function (data) {
+//            waittime = new Date();
+//            waittime.setMinutes(currentTime.getMinutes() + 120);
+//            waitBitMore.setMinutes(waittime.getMinutes() + 1);
+//            queue = [];
+//        });
+        timer(7200000, filename, true);
+        }
+    });   
+    
+    eventEmitter.on('enablemail'+filename,  function(){
+        nomoremails = false;
+    });
+    
+});
+
+function timer(milisec, filename, fornomoremails)
+{
+    if(!fornomoremails)
+    {
+    setTimeout(function() {
+        console.log('timer');
+        eventEmitter.emit('time'+filename);
+    }, milisec);
+    }
+    else {
+        setTimeout(function() {
+            console.log('nomoreemails');
+            //Some where here the "timeroff" event.on should do a break;
+            eventEmitter.emit('enablemail'+filename);
+        }, 30000);
+    }
+}
+
+var subject='An alert for you';
+
+for (var i = 0; i < fileArray.length; i++)
+{
+    queue[fileArray[i]] = new Array();
+	watchit(fileArray[i],function(){
 	});
-};
+}
+
 function sendmail(subject,text,callback){
 
 	var nodemailer = require('nodemailer');
@@ -39,24 +97,20 @@ function sendmail(subject,text,callback){
 
 function watchit(filename,callback)
 {
-	
+    console.log("watchit");
 	if (!fs.existsSync(filename)) fs.writeFileSync(filename, "");
 	var tail = new Tail(filename, '\n');
 	tail.on('line', function(data) {
-//		console.log(queue.length);
-		queue.push(data);
-		var currentTime = new Date();
-		if((queue.length > 10 || waitBitMore < currentTime) && (waittime <  currentTime))
-		{
-			sendmail(subject,queue.toString(),function(data){
-				waittime=new Date();
-				waittime.setMinutes(currentTime.getMinutes()+120);
-				waitBitMore.setMinutes(waittime.getMinutes()+1);
-				queue = [];
-//				console.log("I will be back " +data +currentTime+" " + waittime);
-			});
-			
-		}
+        if(!nomoremails)
+        {
+            queue[filename].push(data);
+            if(queue[filename].length>10)
+            {
+                eventEmitter.emit('enoughlines'+filename);
+            }
+            console.log(queue[filename]);
+            eventEmitter.emit('aline', filename);
+        }
 	});
 	tail.on('error', function(data) {
   		console.log("error:", data);
