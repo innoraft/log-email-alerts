@@ -11,16 +11,14 @@ var nomoremails = false;
 var timerset = false
 
 eventEmitter.on('aline',  function(filename){
-    timer(10000, filename);
+    timer(10000, filename, false);
     eventEmitter.on('time'+filename,  function(){
         eventEmitter.emit('sendmail'+filename);
-//        eventEmitter.emit('nomoremails'+filename);
         nomoremails = true;
     });
     
     eventEmitter.on('enoughlines'+filename,  function(){
         eventEmitter.emit('sendmail'+filename);
-//        eventEmitter.emit('nomoremails'+filename);
         nomoremails = true;
     });
     
@@ -29,10 +27,6 @@ eventEmitter.on('aline',  function(filename){
         {
         console.log("sendmail");
 //        sendmail(subject, queue.toString(), function (data) {
-//            waittime = new Date();
-//            waittime.setMinutes(currentTime.getMinutes() + 120);
-//            waitBitMore.setMinutes(waittime.getMinutes() + 1);
-//            queue = [];
 //        });
         timerset = false;
         timer(7200000, filename, true);
@@ -49,18 +43,18 @@ function timer(milisec, filename, fornomoremails)
 {
     if(!fornomoremails)
     {
-    setTimeout(function() {
-        console.log('timer set');
-        eventEmitter.emit('time'+filename);
         timerset = true;
-    }, milisec);
-    }
-    else {
+        console.log('timer set');
         setTimeout(function() {
-            console.log('nomoreemails');
-            //Some where here the "timeroff" event.on should do a break;
+            eventEmitter.emit('time'+filename);
+        }, milisec);
+    }
+    else 
+    {
+        console.log('nomoreemails timer set');
+        setTimeout(function() {
             eventEmitter.emit('enablemail'+filename);
-        }, 30000);
+        }, milisec);
     }
 }
 
@@ -112,6 +106,7 @@ function watchit(filename,callback)
                 eventEmitter.emit('enoughlines'+filename);
             }
             console.log(queue[filename]);
+            console.log("timerset is "+timerset)
             if(!timerset)
             {
                 eventEmitter.emit('aline', filename);
