@@ -8,6 +8,7 @@ var fileArray=['im.log','im.1.log'];
 
 var queue = {};
 var nomoremails = false;
+var timerset = false
 
 eventEmitter.on('aline',  function(filename){
     timer(10000, filename);
@@ -33,6 +34,7 @@ eventEmitter.on('aline',  function(filename){
 //            waitBitMore.setMinutes(waittime.getMinutes() + 1);
 //            queue = [];
 //        });
+        timerset = false;
         timer(7200000, filename, true);
         }
     });   
@@ -48,8 +50,9 @@ function timer(milisec, filename, fornomoremails)
     if(!fornomoremails)
     {
     setTimeout(function() {
-        console.log('timer');
+        console.log('timer set');
         eventEmitter.emit('time'+filename);
+        timerset = true;
     }, milisec);
     }
     else {
@@ -109,7 +112,10 @@ function watchit(filename,callback)
                 eventEmitter.emit('enoughlines'+filename);
             }
             console.log(queue[filename]);
-            eventEmitter.emit('aline', filename);
+            if(!timerset)
+            {
+                eventEmitter.emit('aline', filename);
+            }
         }
 	});
 	tail.on('error', function(data) {
