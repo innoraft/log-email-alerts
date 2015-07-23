@@ -1,17 +1,18 @@
 var Tail = require('always-tail');
 var fs = require('fs');
 
+var _globals = require('./_globals.js');
 var events = require('events');
 var eventEmitter = new events.EventEmitter();
 
-var fileArray=['im.log','im.1.log'];
+var fileArray = _globals.fileArray;
 
 var queue = {};
 var nomoremails = {}; //false;
 var timerset = {}; //false
 
 eventEmitter.on('aline',  function(filename){
-    timer(10000, filename, false);
+    timer(_globals.seekLinesTillMiliSec, filename, false);
     eventEmitter.on('time'+filename,  function(){
         eventEmitter.emit('sendmail'+filename);
         nomoremails[filename] = true;
@@ -25,12 +26,13 @@ eventEmitter.on('aline',  function(filename){
     eventEmitter.on('sendmail'+filename,  function(){
         if(!nomoremails[filename])
         {
-            queue[filename] = [];
-            console.log("sendmail");
-    //        sendmail(subject, queue.toString(), function (data) {
-    //        });
+            console.log("sendmail for "+filename);
+	    console.log(queue[filename].toString());
+            sendmail("Some error occured in "+filename, queue[filename].toString(), function (data) {
+            });
+	    queue[filename] = [];
             timerset[filename] = false;
-            timer(7200000, filename, true);
+            timer(_globals.nomorEmailsTillMiliSec, filename, true);
         }
     });   
     
@@ -79,8 +81,8 @@ function sendmail(subject,text,callback){
 	});
  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 	var mailOptions = {
-	    from: 'from@domain.com', // sender address 
-	    to: 'to@domain.com', // list of receivers 
+	    from: _globals.alertsFromEmail, // sender address 
+	    to: _globals.alertsToEmail, // list of receivers 
 	    subject: subject, // Subject line 
 	    text: text, // plaintext body 
 	    html: ''
@@ -104,7 +106,7 @@ function watchit(filename,callback)
         if(!nomoremails[filename])
         {
             queue[filename].push(data);
-            if(queue[filename].length>10)
+            if(queue[filename].length>_globals.seekTimeTillLines)
             {
                 eventEmitter.emit('enoughlines'+filename);
             }
