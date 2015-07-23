@@ -1,10 +1,8 @@
 var Tail = require('always-tail');
 var fs = require('fs');
-
 var _globals = require('./_globals.js');
 var events = require('events');
 var eventEmitter = new events.EventEmitter();
-
 var fileArray = _globals.fileArray;
 
 var queue = {};
@@ -27,10 +25,10 @@ eventEmitter.on('aline',  function(filename){
         if(!nomoremails[filename])
         {
             console.log("sendmail for "+filename);
-	    console.log(queue[filename].toString());
+            console.log(queue[filename].toString());
             sendmail("Some error occured in "+filename, queue[filename].toString(), function (data) {
             });
-	    queue[filename] = [];
+            queue[filename] = [];
             timerset[filename] = false;
             timer(_globals.nomorEmailsTillMiliSec, filename, true);
         }
@@ -61,8 +59,6 @@ function timer(milisec, filename, fornomoremails)
     }
 }
 
-var subject='An alert for you';
-
 for (var i = 0; i < fileArray.length; i++)
 {
     queue[fileArray[i]] = new Array();
@@ -73,7 +69,6 @@ for (var i = 0; i < fileArray.length; i++)
 }
 
 function sendmail(subject,text,callback){
-
 	var nodemailer = require('nodemailer');
 	var transporter = nodemailer.createTransport({
 	       	host: "localhost",
