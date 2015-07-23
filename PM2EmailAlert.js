@@ -7,34 +7,35 @@ var eventEmitter = new events.EventEmitter();
 var fileArray=['im.log','im.1.log'];
 
 var queue = {};
-var nomoremails = false;
-var timerset = false
+var nomoremails = {}; //false;
+var timerset = {}; //false
 
 eventEmitter.on('aline',  function(filename){
     timer(10000, filename, false);
     eventEmitter.on('time'+filename,  function(){
         eventEmitter.emit('sendmail'+filename);
-        nomoremails = true;
+        nomoremails[filename] = true;
     });
     
     eventEmitter.on('enoughlines'+filename,  function(){
         eventEmitter.emit('sendmail'+filename);
-        nomoremails = true;
+        nomoremails[filename] = true;
     });
     
     eventEmitter.on('sendmail'+filename,  function(){
-        if(!nomoremails)
+        if(!nomoremails[filename])
         {
-        console.log("sendmail");
-//        sendmail(subject, queue.toString(), function (data) {
-//        });
-        timerset = false;
-        timer(7200000, filename, true);
+            queue[filename] = [];
+            console.log("sendmail");
+    //        sendmail(subject, queue.toString(), function (data) {
+    //        });
+            timerset[filename] = false;
+            timer(7200000, filename, true);
         }
     });   
     
     eventEmitter.on('enablemail'+filename,  function(){
-        nomoremails = false;
+        nomoremails[filename] = false;
     });
     
 });
@@ -43,7 +44,7 @@ function timer(milisec, filename, fornomoremails)
 {
     if(!fornomoremails)
     {
-        timerset = true;
+        timerset[filename] = true;
         console.log('timer set');
         setTimeout(function() {
             eventEmitter.emit('time'+filename);
@@ -63,6 +64,8 @@ var subject='An alert for you';
 for (var i = 0; i < fileArray.length; i++)
 {
     queue[fileArray[i]] = new Array();
+    nomoremails[fileArray[i]] = false;
+    timerset[fileArray[i]] = false;
 	watchit(fileArray[i],function(){
 	});
 }
@@ -98,7 +101,7 @@ function watchit(filename,callback)
 	if (!fs.existsSync(filename)) fs.writeFileSync(filename, "");
 	var tail = new Tail(filename, '\n');
 	tail.on('line', function(data) {
-        if(!nomoremails)
+        if(!nomoremails[filename])
         {
             queue[filename].push(data);
             if(queue[filename].length>10)
@@ -106,8 +109,8 @@ function watchit(filename,callback)
                 eventEmitter.emit('enoughlines'+filename);
             }
             console.log(queue[filename]);
-            console.log("timerset is "+timerset)
-            if(!timerset)
+            console.log("timerset is "+timerset[filename])
+            if(!timerset[filename])
             {
                 eventEmitter.emit('aline', filename);
             }
