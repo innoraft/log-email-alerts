@@ -1,5 +1,5 @@
 {
-  "name": "aws-backup-tool",
+  "name": "log-email-alerts",
   "version": "0.0.0",
   "private": true,
   "dependencies": {
