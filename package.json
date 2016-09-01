@@ -14,5 +14,10 @@
       "pm2"
   ],
   "author": "Innoraft",
-  "license": "MIT"
+  "contributors" : [
+      "Sumit Sinha <sumitsinha1989+github@gmail.com>",
+      "Anand Pathak <anandpathak69+github@gmail.com>"
+  ],
+  "license": "MIT",
+  "repository": "https://github.com/innoraft/log-email-alerts"
 }
