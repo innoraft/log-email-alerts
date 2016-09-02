@@ -30,7 +30,7 @@ eventEmitter.on('aline',  function(filename){
             });
             queue[filename] = [];
             timerset[filename] = false;
-            timer(_globals.nomorEmailsTillMiliSec, filename, true);
+            timer(_globals.noMoreEmailsTillMiliSec, filename, true);
         }
     });   
     
