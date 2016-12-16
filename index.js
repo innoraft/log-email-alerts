@@ -1,6 +1,5 @@
 var Tail = require('always-tail');
 var fs = require('fs');
-var _globals = require('./sample._globals.js');
 var events = require('events');
 
 function logEmailAlerts (config) {

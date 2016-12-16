@@ -14,7 +14,7 @@ User can customize the number of lines to send from the log file and also the de
 ##Example
   
 ````Javascript
-    var logEmailAlerts = require('./logEmailAlerts');
+    var logEmailAlerts = require('log-email-alerts');
     var config = {
         file_array : ['abc.log', '/var/some/thing.log']
         ,alerts_to_email : "someone@example.com"

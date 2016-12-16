@@ -1,4 +1,4 @@
-var logEmailAlerts = require('./logEmailAlerts');
+var logEmailAlerts = require('log-email-alerts');
 
 var config = {
     file_array : ['abc.log']
