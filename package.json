@@ -1,11 +1,12 @@
 {
   "name": "log-email-alerts",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "This is a node.js script which alerts on new line occurrence in a log file. We made this to use with PM2",
   "main":"index.js",
   "private": false,
   "dependencies": {
     "always-tail": "^0.1.1"
+   ,"nodemailer": "^1.4.0"
   },
   "keywords": [
       "log",

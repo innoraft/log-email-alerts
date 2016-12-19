@@ -1,6 +1,7 @@
 var Tail = require('always-tail');
 var fs = require('fs');
 var events = require('events');
+var nodemailer = require('nodemailer');
 
 function logEmailAlerts (config) {
     var eventEmitter = new events.EventEmitter()
@@ -67,7 +68,6 @@ function logEmailAlerts (config) {
         callback();
     }
     function sendmail(subject,text,callback){
-    	var nodemailer = require('nodemailer');
     	var transporter = nodemailer.createTransport({
     	       	host: "localhost",
             	port : "25",
