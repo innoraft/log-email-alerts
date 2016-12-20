@@ -9,10 +9,10 @@ function logEmailAlerts (config) {
     var nomoremails = {}; //false;
     var timerset = {}; //false
     var alerts_to_email = (config.alerts_to_email)? config.alerts_to_email : "someone@example.com"
-        ,alerts_from_email = (alerts_from_email)? alerts_from_email :  "someone@example.com"
-        ,no_more_emails_till_mili_sec = (no_more_emails_till_mili_sec)? no_more_emails_till_mili_sec :  7200000
-        ,collect_lines_till_mili_sec = (collect_lines_till_mili_sec)? collect_lines_till_mili_sec :  10000
-        ,max_lines_to_collect = (max_lines_to_collect)? max_lines_to_collect :  10 ;
+        ,alerts_from_email = (config.alerts_from_email)? config.alerts_from_email :  "someone@example.com"
+        ,no_more_emails_till_mili_sec = (config.no_more_emails_till_mili_sec)? config.no_more_emails_till_mili_sec :  7200000
+        ,collect_lines_till_mili_sec = (config.collect_lines_till_mili_sec)? config.collect_lines_till_mili_sec :  10000
+        ,max_lines_to_collect = (config.max_lines_to_collect)? config.max_lines_to_collect :  10 ;
     for (var i = 0; i < config.file_array.length; i++)
     {
         queue[config.file_array[i]] = new Array();
