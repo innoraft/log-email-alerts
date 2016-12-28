@@ -1,5 +1,7 @@
 # log-email-alerts
 
+[![NPM](https://nodei.co/npm/log-email-alerts.png)](https://nodei.co/npm/log-email-alerts/)
+
 This is a node.js package which alerts on any new line occurrence in a log file (or any text file).
 Its use cases be - getting notified for an error or warning occurance in your log file on some server or sending report from a file when a new data is added. In our case we mostly used it with PM2 to alert us whenever a script fails.
 
