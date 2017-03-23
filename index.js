@@ -10,6 +10,7 @@ function logEmailAlerts (config) {
     var timerset = {}; //false
     var alerts_to_email = (config.alerts_to_email)? config.alerts_to_email : "someone@example.com"
         ,alerts_from_email = (config.alerts_from_email)? config.alerts_from_email :  "someone@example.com"
+        ,keywords = (config.keywords)? config.keywords :  ""
         ,no_more_emails_till_mili_sec = (config.no_more_emails_till_mili_sec)? config.no_more_emails_till_mili_sec :  7200000
         ,collect_lines_till_mili_sec = (config.collect_lines_till_mili_sec)? config.collect_lines_till_mili_sec :  10000
         ,max_lines_to_collect = (config.max_lines_to_collect)? config.max_lines_to_collect :  10 ;
@@ -40,26 +41,31 @@ function logEmailAlerts (config) {
             }, milisec);
         }
     }
-    function watchit(filename,callback)
+    function watchit(filename, keywords, callback)
     {
         console.log("watchit");
         if (!fs.existsSync(filename)) fs.writeFileSync(filename, "");
         var tail = new Tail(filename, '\n');
         tail.on('line', function(data) {
-            if(!nomoremails[filename])
-            {
-                queue[filename].push(data);
-                if(queue[filename].length>max_lines_to_collect)
-                {
-                    eventEmitter.emit('enoughlines'+filename);
-                }
-                console.log(queue[filename]);
-                console.log("timerset is "+timerset[filename])
-                if(!timerset[filename])
-                {
-                    eventEmitter.emit('aline', filename);
-                }
-            }
+            var count = keywords.length == 0 ? 1 : keywords.length;
+          	for(var i=0;i<count;i++) {
+            	if(data.match(keywords[i])) {
+	              	if(!nomoremails[filename])
+	              	{
+	                  queue[filename].push(data);
+	                  if(queue[filename].length>max_lines_to_collect)
+	                  {
+	                      eventEmitter.emit('enoughlines'+filename);
+	                  }
+	                  console.log(queue[filename]);
+	                  console.log("timerset is "+timerset[filename])
+	                  if(!timerset[filename])
+	                  {
+	                      eventEmitter.emit('aline', filename);
+	                  }
+	              	}
+            	}
+          	}
         });
         tail.on('error', function(data) {
             console.log("error:", data);
