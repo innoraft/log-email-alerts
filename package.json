@@ -18,7 +18,8 @@
   "author": "Innoraft",
   "contributors" : [
       "Sumit Sinha <sumitsinha1989+github@gmail.com>",
-      "Anand Pathak <anandpathak69+github@gmail.com>"
+      "Anand Pathak <anandpathak69+github@gmail.com>",
+      "Jasodeep Chatterjee <jasodeepchatterjee+github@gmail.com>"
   ],
   "license": "MIT",
   "repository": "https://github.com/innoraft/log-email-alerts"
